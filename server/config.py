@@ -13,4 +13,4 @@ TEST_URL = 'http://www.baidu.com'
 # 验证周期
 TEST_CYCLE = 2
 # 接收器运行端口
-RECEIVER_PORT = 8888
+RECEIVER_PORT = 8000

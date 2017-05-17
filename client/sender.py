@@ -1,14 +1,24 @@
 import subprocess
 
+import time
+
+from client.config import *
+import requests
+
 
 class Sender():
     def __init__(self):
         pass
 
-    def adsl_start(self):
-        (status, output) = subprocess.getstatusoutput('pwd')
-        print(status)
-        print(output)
+    def adsl(self):
+        while True:
+            (status, output) = subprocess.getstatusoutput(ADSL_BASH)
+            print(status)
+            if status == 0:
+                print('ADSL Successfully')
+            print(output)
+            requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT})
+            time.sleep(ADSL_CYCLE)
 
 
 def run():
