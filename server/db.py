@@ -15,6 +15,9 @@ class RedisClient(object):
         self.remove(proxy)
         return self.db.lpush(self.proxy_key, proxy)
 
+    def count(self):
+        return self.db.llen(self.proxy_key)
+
     def remove(self, proxy):
         return self.db.lrem(self.proxy_key, proxy, 0)
 

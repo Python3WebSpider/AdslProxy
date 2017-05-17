@@ -12,9 +12,5 @@ TOKEN = 'adsl'
 TEST_URL = 'http://www.baidu.com'
 # 验证周期
 TEST_CYCLE = 2
-
-
-# 接收器开关
-RECEIVER_ENABLE = True
-# 验证器开关
-TESTER_ENABLE = True
+# 接收器运行端口
+RECEIVER_PORT = 8888
