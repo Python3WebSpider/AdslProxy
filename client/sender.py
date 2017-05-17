@@ -23,7 +23,7 @@ class Sender():
 
 def run():
     sender = Sender()
-    sender.adsl_start()
+    sender.adsl()
 
 
 if __name__ == '__main__':
