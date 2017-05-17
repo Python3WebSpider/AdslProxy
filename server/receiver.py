@@ -34,7 +34,6 @@ class MainHandler(RequestHandler):
             (proxy_host, proxy_port) = tuple(proxy.split(':'))
             print('Testing Proxy', proxy)
             request = HTTPRequest(url=TEST_URL, proxy_host=proxy_host, proxy_port=int(proxy_port))
-            print(request)
             self.http_client.fetch(request, self.handle_proxy)
         except ValueError:
             print('Invalid Proxy', proxy)

@@ -4,6 +4,7 @@ import time
 
 from client.config import *
 import requests
+from requests.exceptions import ConnectionError
 
 
 class Sender():
@@ -13,11 +14,13 @@ class Sender():
     def adsl(self):
         while True:
             (status, output) = subprocess.getstatusoutput(ADSL_BASH)
-            print(status)
             if status == 0:
                 print('ADSL Successfully')
-            print(output)
-            requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT})
+            try:
+                requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT})
+                print('Successfully Sent to Server', SERVER_URL)
+            except ConnectionError:
+                print('Failed to Connect Server', SERVER_URL)
             time.sleep(ADSL_CYCLE)
 
 
