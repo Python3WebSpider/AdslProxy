@@ -1,11 +1,12 @@
+import time
 import tornado
 from tornado.curl_httpclient import CurlAsyncHTTPClient
 from tornado.httpclient import HTTPRequest
-from server.config import TEST_URl
+from server.config import TEST_URL, TEST_CYCLE
 from server.db import RedisClient
 
 
-class Verify():
+class Tester():
     def __init__(self):
         self.http_client = CurlAsyncHTTPClient(force_instance=True)
         self.redis = RedisClient()
@@ -22,22 +23,27 @@ class Verify():
             print('Valid Proxy', proxy)
 
     def verify(self, proxy):
-        (proxy_host, proxy_port) = tuple(proxy.split(':'))
-        print(proxy_host, proxy_port)
-        request = HTTPRequest(url=TEST_URl, proxy_host=proxy_host, proxy_port=int(proxy_port))
-        print(request)
-        self.http_client.fetch(request, self.test_proxy)
+
+        try:
+            (proxy_host, proxy_port) = tuple(proxy.split(':'))
+            print('Testing Proxy', proxy)
+            request = HTTPRequest(url=TEST_URL, proxy_host=proxy_host, proxy_port=int(proxy_port))
+            print(request)
+            self.http_client.fetch(request, self.test_proxy)
+        except ValueError:
+            print('Invalid Proxy', proxy)
+            self.redis.remove(proxy)
 
     def run(self):
         while True:
-            self.verify('127.0.0.1:9743')
-
-
-
+            proxies = self.redis.all()
+            for proxy in proxies:
+                self.verify(proxy)
+            time.sleep(TEST_CYCLE)
 
         tornado.ioloop.IOLoop.instance().start()
 
 
 if __name__ == '__main__':
-    verify = Verify()
-    verify.run()
+    tester = Tester()
+    tester.run()

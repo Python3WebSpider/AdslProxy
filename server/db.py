@@ -21,6 +21,9 @@ class RedisClient(object):
     def flush(self):
         return self.db.flushall()
 
+    def all(self):
+        return [proxy.decode('utf-8') for proxy in self.db.lrange(self.proxy_key, 0, -1)]
+
 
 if __name__ == '__main__':
     client = RedisClient()
@@ -30,4 +33,5 @@ if __name__ == '__main__':
     client.add('abc4')
     client.remove('abc4')
     result = client.get()
+    print(client.all())
     print(result)
