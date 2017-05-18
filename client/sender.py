@@ -9,8 +9,7 @@ from requests.exceptions import ConnectionError
 
 
 class Sender():
-    def __init__(self):
-        pass
+
 
     def get_ip(self, ifname=ADSL_IFNAME):
         (status, output) = subprocess.getstatusoutput('ifconfig')
