@@ -20,6 +20,7 @@ class Sender():
                 ip = result.group(1)
                 return ip
 
+
     def adsl(self):
         while True:
             print('ADSL Start, Please wait')
@@ -32,9 +33,9 @@ class Sender():
                     try:
                         requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT, 'name': CLIENT_NAME})
                         print('Successfully Sent to Server', SERVER_URL)
-                        time.sleep(ADSL_CYCLE)
                     except ConnectionError:
                         print('Failed to Connect Server', SERVER_URL)
+                    time.sleep(ADSL_CYCLE)
                 else:
                     print('Get IP Failed')
             else:
