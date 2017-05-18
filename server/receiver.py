@@ -1,4 +1,6 @@
-import time
+import json
+from urllib.parse import urlencode, parse_qs, urlsplit
+
 import tornado.ioloop
 import tornado.web
 from tornado.curl_httpclient import CurlAsyncHTTPClient
@@ -16,18 +18,18 @@ class MainHandler(RequestHandler):
         request = response.request
         host = request.proxy_host
         port = request.proxy_port
+        name = parse_qs(urlsplit(request.url).query).get('name')[0]
         proxy = '{host}:{port}'.format(host=host, port=port)
         if response.error:
             print('Request failed Using', proxy, response.error)
             print('Invalid Proxy', proxy, 'Remove it')
-            self.redis.remove(proxy)
+            self.redis.remove(name)
         else:
-            print('Valid Proxy', proxy)
+            print('Valid Proxy', name)
 
     def test_proxies(self):
         print('Test Proxies')
         items = self.redis.all()
-        print(items)
         for item in items:
             self.test_proxy(item)
 
@@ -37,7 +39,8 @@ class MainHandler(RequestHandler):
         try:
             (proxy_host, proxy_port) = tuple(proxy.split(':'))
             print('Testing Proxy', name, proxy)
-            request = HTTPRequest(url=TEST_URL, proxy_host=proxy_host, proxy_port=int(proxy_port))
+            test_url = TEST_URL + '?' + urlencode({'name': name})
+            request = HTTPRequest(url=test_url, proxy_host=proxy_host, proxy_port=int(proxy_port))
             self.http_client.fetch(request, self.handle_proxy)
         except ValueError:
             print('Invalid Proxy', proxy)
@@ -59,10 +62,23 @@ class MainHandler(RequestHandler):
             self.write('No Client Port')
 
     def get(self, api):
-        if api == 'get':
-            result = self.redis.get()
+        if api == 'first':
+            result = self.redis.first()
             if result:
                 self.write(result)
+
+        if api == 'random':
+            result = self.redis.random()
+            if result:
+                self.write(result)
+
+        if api == 'list':
+            result = self.redis.list()
+            print(result)
+            if result:
+                for proxy in result:
+                    self.write(proxy + '<br>')
+
         if api == 'count':
             self.write(str(self.redis.count()))
 
