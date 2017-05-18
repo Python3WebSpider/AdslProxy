@@ -8,5 +8,9 @@ PROXY_PORT = 8888
 
 # 服务器地址
 SERVER_URL = 'http://120.27.34.24:8000'
+
 # 通信秘钥
 TOKEN = 'adsl'
+
+# 客户端唯一标识
+CLIENT_NAME = 'adsl1'

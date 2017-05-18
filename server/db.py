@@ -7,34 +7,36 @@ class RedisClient(object):
     def __init__(self, host=REDIS_HOST, port=REDIS_PORT):
         self.db = redis.Redis(host=host, port=port, password=REDIS_PASSWORD)
         self.proxy_key = PROXY_KEY
+    
+    def key(self, name):
+        return '{key}:{name}'.format(key=self.proxy_key, name=name)
+    
+    def set(self, name, proxy):
+        return self.db.set(self.key(name), proxy)
 
-    def get(self):
-        return self.db.lindex(self.proxy_key, 0)
-
-    def add(self, proxy):
-        self.remove(proxy)
-        return self.db.lpush(self.proxy_key, proxy)
+    def get(self, name):
+        return self.db.get(self.key(name)).decode('utf-8')
 
     def count(self):
-        return self.db.llen(self.proxy_key)
-
-    def remove(self, proxy):
-        return self.db.lrem(self.proxy_key, proxy, 0)
-
-    def flush(self):
-        return self.db.flushall()
+        return len(self.db.keys(self.key('*')))
+    
+    def remove(self, name):
+        return self.db.delete(self.key(name))
 
     def all(self):
-        return [proxy.decode('utf-8') for proxy in self.db.lrange(self.proxy_key, 0, -1)]
+        keys = [key.decode('utf-8').replace(self.proxy_key + ':', '') for key in self.db.keys(self.key('*'))]
+        proxies = [{'name': key, 'proxy': self.get(key)} for key in keys]
+        return proxies
 
 
 if __name__ == '__main__':
     client = RedisClient()
-    client.add('abc')
-    client.add('abc2')
-    client.add('abc3')
-    client.add('abc4')
-    client.remove('abc4')
-    result = client.get()
+    client.set('a', 'abc')
+    client.set('c', 'abc2')
+    client.set('c', 'abc3')
+    client.set('b', 'abc4')
+    client.remove('b')
+    result = client.get('a')
+    print(client.count())
     print(client.all())
     print(result)

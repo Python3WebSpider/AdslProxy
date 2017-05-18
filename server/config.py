@@ -12,3 +12,5 @@ TOKEN = 'adsl'
 TEST_URL = 'http://www.baidu.com'
 # 接收器运行端口
 RECEIVER_PORT = 8000
+# 检测间隔
+TEST_CYCLE = 20
