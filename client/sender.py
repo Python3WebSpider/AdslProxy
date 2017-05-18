@@ -17,7 +17,7 @@ class Sender():
             if status == 0:
                 print('ADSL Successfully')
             try:
-                requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT})
+                requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT, 'name': CLIENT_NAME})
                 print('Successfully Sent to Server', SERVER_URL)
             except ConnectionError:
                 print('Failed to Connect Server', SERVER_URL)
