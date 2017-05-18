@@ -14,3 +14,6 @@ TOKEN = 'adsl'
 
 # 客户端唯一标识
 CLIENT_NAME = 'adsl1'
+
+# 拨号网卡
+ADSL_IFNAME = 'ppp0'

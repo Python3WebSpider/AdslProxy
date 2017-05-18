@@ -1,3 +1,4 @@
+import re
 import subprocess
 
 import time
@@ -11,17 +12,35 @@ class Sender():
     def __init__(self):
         pass
 
+    def get_ip(self, ifname=ADSL_IFNAME):
+        (status, output) = subprocess.getstatusoutput('ifconfig')
+        if status == 0:
+            pattern = re.compile(ifname + '.*?inet.*?(\d+\.\d+\.\d+\.\d+).*?netmask', re.S)
+            result = re.search(pattern, output)
+            if result:
+                ip = result.group(1)
+                return ip
+
     def adsl(self):
         while True:
+            print('ADSL Start, Please wait')
             (status, output) = subprocess.getstatusoutput(ADSL_BASH)
             if status == 0:
                 print('ADSL Successfully')
-            try:
-                requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT, 'name': CLIENT_NAME})
-                print('Successfully Sent to Server', SERVER_URL)
-            except ConnectionError:
-                print('Failed to Connect Server', SERVER_URL)
-            time.sleep(ADSL_CYCLE)
+                ip = self.get_ip()
+                if ip:
+                    print('New IP', ip)
+                    try:
+                        requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT, 'name': CLIENT_NAME})
+                        print('Successfully Sent to Server', SERVER_URL)
+                        time.sleep(ADSL_CYCLE)
+                    except ConnectionError:
+                        print('Failed to Connect Server', SERVER_URL)
+                else:
+                    print('Get IP Failed')
+            else:
+                print('ADSL Failed, Please Check')
+            time.sleep(1)
 
 
 def run():

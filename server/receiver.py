@@ -1,15 +1,47 @@
 import time
 import tornado.ioloop
 import tornado.web
-from multiprocessing import Process
+from tornado.curl_httpclient import CurlAsyncHTTPClient
 from tornado.web import RequestHandler, Application
 from server.config import *
 from server.db import RedisClient
-from server.tester import TestHandler
+from tornado.httpclient import HTTPRequest
 
 
 class MainHandler(RequestHandler):
     redis = RedisClient()
+    http_client = CurlAsyncHTTPClient(force_instance=True)
+
+    def handle_proxy(self, response):
+        request = response.request
+        host = request.proxy_host
+        port = request.proxy_port
+        proxy = '{host}:{port}'.format(host=host, port=port)
+        if response.error:
+            print('Request failed Using', proxy, response.error)
+            print('Invalid Proxy', proxy, 'Remove it')
+            self.redis.remove(proxy)
+        else:
+            print('Valid Proxy', proxy)
+
+    def test_proxies(self):
+        print('Test Proxies')
+        items = self.redis.all()
+        print(items)
+        for item in items:
+            self.test_proxy(item)
+
+    def test_proxy(self, item):
+        proxy = item.get('proxy')
+        name = item.get('name')
+        try:
+            (proxy_host, proxy_port) = tuple(proxy.split(':'))
+            print('Testing Proxy', name, proxy)
+            request = HTTPRequest(url=TEST_URL, proxy_host=proxy_host, proxy_port=int(proxy_port))
+            self.http_client.fetch(request, self.handle_proxy)
+        except ValueError:
+            print('Invalid Proxy', proxy)
+            self.redis.remove(name)
 
     def post(self):
         token = self.get_body_argument('token', default=None, strip=False)
@@ -20,6 +52,7 @@ class MainHandler(RequestHandler):
             proxy = ip + ':' + port
             print('Receive proxy', proxy)
             self.redis.set(name, proxy)
+            self.test_proxies()
         elif token != TOKEN:
             self.write('Wrong Token')
         elif not port:
@@ -41,8 +74,6 @@ def run():
     ])
     print('Listening on', RECEIVER_PORT)
     application.listen(RECEIVER_PORT)
-    tester = TestHandler()
-    Process(target=tester.test_proxies).start()
     tornado.ioloop.IOLoop.instance().start()
 
 
