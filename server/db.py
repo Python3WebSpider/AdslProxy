@@ -23,10 +23,6 @@ class RedisClient(object):
     def remove(self, name):
         return self.db.delete(self.key(name))
 
-    def random(self):
-        items = self.all()
-        return random.choice(items).get('proxy')
-
     def keys(self):
         return [key.decode('utf-8').replace(self.proxy_key + ':', '') for key in self.db.keys(self.key('*'))]
 
@@ -34,6 +30,10 @@ class RedisClient(object):
         keys = self.keys()
         proxies = [{'name': key, 'proxy': self.get(key)} for key in keys]
         return proxies
+
+    def random(self):
+        items = self.all()
+        return random.choice(items).get('proxy')
 
     def list(self):
         keys = self.keys()
@@ -55,3 +55,4 @@ if __name__ == '__main__':
     print(client.count())
     print(client.all())
     print(result)
+
