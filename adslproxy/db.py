@@ -1,6 +1,6 @@
 import redis
 import random
-from server.config import *
+from adslproxy.config import *
 
 
 class RedisClient(object):
