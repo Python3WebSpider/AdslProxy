@@ -30,8 +30,11 @@ class Sender():
                 print('ADSL Successfully')
                 ip = self.get_ip()
                 if ip:
+                    print('Now IP', ip)
                     try:
+                        print('Testing Proxy, Please Wait')
                         proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
+                        print('Proxy', proxy)
                         response = requests.get(TEST_URL, proxies={
                             'http': 'http://' + proxy,
                             'https': 'https://' + proxy
