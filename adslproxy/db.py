@@ -12,6 +12,8 @@ class RedisClient(object):
         return '{key}:{name}'.format(key=self.proxy_key, name=name)
     
     def set(self, name, proxy):
+        print(name, proxy)
+
         return self.db.set(self.key(name), proxy)
 
     def get(self, name):

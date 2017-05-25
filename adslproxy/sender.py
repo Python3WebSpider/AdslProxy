@@ -21,10 +21,10 @@ class Sender():
                 ip = result.group(1)
                 return ip
 
-    def test_proxy(self):
+    def test_proxy(self, proxy):
         try:
             response = requests.get(TEST_URL, proxies={
-                'http': 'http://127.0.0.1:' + str(PROXY_PORT)
+                'http': 'http://' + proxy
             }, timeout=TEST_TIMEOUT)
             if response.status_code == 200:
                 return True
@@ -42,8 +42,10 @@ class Sender():
                 if ip:
                     print('Now IP', ip)
                     print('Testing Proxy, Please Wait')
-                    if self.test_proxy():
+                    proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
+                    if self.test_proxy(proxy):
                         print('Valid Proxy')
+                        self.redis.set(CLIENT_NAME, proxy)
                         time.sleep(ADSL_CYCLE)
                     else:
                         print('Invalid Proxy')
