@@ -2,7 +2,7 @@ import re
 import subprocess
 import time
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ReadTimeout
 
 from adslproxy.db import RedisClient
 from adslproxy.config import *
@@ -38,11 +38,11 @@ class Sender():
                         response = requests.get(TEST_URL, proxies={
                             'http': 'http://' + proxy,
                             'https': 'https://' + proxy
-                        })
+                        }, timeout=10)
                         if response.status_code == 200:
                             self.redis.set(CLIENT_NAME, proxy)
                             time.sleep(ADSL_CYCLE)
-                    except ConnectionError:
+                    except (ConnectionError, ReadTimeout):
                         print('Invalid Proxy, Re Dialing')
                 else:
                     print('Get IP Failed, Re Dialing')
