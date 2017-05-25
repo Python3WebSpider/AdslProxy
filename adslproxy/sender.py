@@ -9,9 +9,6 @@ from adslproxy.config import *
 
 
 class Sender():
-    def __init__(self):
-        self.redis = RedisClient()
-
     def get_ip(self, ifname=ADSL_IFNAME):
         (status, output) = subprocess.getstatusoutput('ifconfig')
         if status == 0:
@@ -31,10 +28,18 @@ class Sender():
         except (ConnectionError, ReadTimeout):
             return False
 
+    def remove_proxy(self):
+        self.redis = RedisClient()
+        self.redis.remove(CLIENT_NAME)
+
+    def set_proxy(self, proxy):
+        self.redis = RedisClient()
+        self.redis.set(CLIENT_NAME, proxy)
+
     def adsl(self):
         while True:
             print('ADSL Start, Remove Proxy, Please wait')
-            self.redis.remove(CLIENT_NAME)
+            self.remove_proxy()
             (status, output) = subprocess.getstatusoutput(ADSL_BASH)
             if status == 0:
                 print('ADSL Successfully')
@@ -45,7 +50,7 @@ class Sender():
                     proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
                     if self.test_proxy(proxy):
                         print('Valid Proxy')
-                        self.redis.set(CLIENT_NAME, proxy)
+                        self.set_proxy()
                         time.sleep(ADSL_CYCLE)
                     else:
                         print('Invalid Proxy')
