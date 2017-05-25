@@ -6,19 +6,19 @@
 
 ### 安装Python
 
-Python3版本
+Python3
 
 
 ### 安装库
 
 ```
-pip3 install redis tornado
+pip3 install redis tornado requests
 ```
 
 ### Clone项目
 
 ```
-git clone https://github.com/Germey/ADSLProxyPool.git
+git clone https://github.com/Germey/ADSLProxy.git
 ```
 
 ### 安装Redis
@@ -28,7 +28,7 @@ git clone https://github.com/Germey/ADSLProxyPool.git
 ### 修改配置
 
 ```
-cd server
+cd adslproxy
 vi config.py
 ```
 
@@ -36,47 +36,19 @@ vi config.py
 
 ### 运行
 
-根目录运行
+#### 拨号程序运行
 
 ```
-python3 server.py
+python3 run.py
 ```
 
-## 客户端
+#### API运行
 
-客户端即拨号主机
-
-### 安装Python
-
-Python3版本
-
-
-### 安装库
 
 ```
-pip3 install requests
-```
-
-### Clone项目
-
-```
-git clone https://github.com/Germey/ADSLProxyPool.git
+python3 api.py
 ```
 
 
-### 修改配置
 
-```
-cd server
-vi config.py
-```
 
-根据注释修改配置文件
-
-### 运行
-
-根目录运行
-
-```
-python3 client.py
-```

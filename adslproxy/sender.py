@@ -1,15 +1,16 @@
 import re
 import subprocess
-
 import time
-
-from client.config import *
 import requests
 from requests.exceptions import ConnectionError
 
+from adslproxy.db import RedisClient
+from adslproxy.config import *
+
 
 class Sender():
-
+    def __init__(self):
+        self.redis = RedisClient()
 
     def get_ip(self, ifname=ADSL_IFNAME):
         (status, output) = subprocess.getstatusoutput('ifconfig')
@@ -20,27 +21,32 @@ class Sender():
                 ip = result.group(1)
                 return ip
 
-
     def adsl(self):
         while True:
-            print('ADSL Start, Please wait')
+            print('ADSL Start, Remove Proxy, Please wait')
+            self.redis.remove(CLIENT_NAME)
             (status, output) = subprocess.getstatusoutput(ADSL_BASH)
             if status == 0:
                 print('ADSL Successfully')
                 ip = self.get_ip()
                 if ip:
-                    print('New IP', ip)
                     try:
-                        requests.post(SERVER_URL, data={'token': TOKEN, 'port': PROXY_PORT, 'name': CLIENT_NAME})
-                        print('Successfully Sent to Server', SERVER_URL)
+                        proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
+                        response = requests.get(TEST_URL, proxies={
+                            'http': 'http://' + proxy,
+                            'https': 'https://' + proxy
+                        })
+                        if response.status_code == 200:
+                            self.redis.set(CLIENT_NAME, proxy)
+                            time.sleep(ADSL_CYCLE)
                     except ConnectionError:
-                        print('Failed to Connect Server', SERVER_URL)
-                    time.sleep(ADSL_CYCLE)
+                        print('Invalid Proxy, Re Dialing')
                 else:
-                    print('Get IP Failed')
+                    print('Get IP Failed, Re Dialing')
+                    time.sleep(ADSL_ERROR_CYCLE)
             else:
                 print('ADSL Failed, Please Check')
-            time.sleep(1)
+                time.sleep(ADSL_ERROR_CYCLE)
 
 
 def run():

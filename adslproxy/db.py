@@ -44,15 +44,3 @@ class RedisClient(object):
         return self.get(self.keys()[0])
 
 
-if __name__ == '__main__':
-    client = RedisClient()
-    client.set('a', 'abc')
-    client.set('c', 'abc2')
-    client.set('c', 'abc3')
-    client.set('b', 'abc4')
-    client.remove('b')
-    result = client.get('a')
-    print(client.count())
-    print(client.all())
-    print(result)
-
