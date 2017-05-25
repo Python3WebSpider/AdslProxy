@@ -31,10 +31,12 @@ class Sender():
     def remove_proxy(self):
         self.redis = RedisClient()
         self.redis.remove(CLIENT_NAME)
+        print('Successfully Removed Proxy')
 
     def set_proxy(self, proxy):
         self.redis = RedisClient()
-        self.redis.set(CLIENT_NAME, proxy)
+        if self.redis.set(CLIENT_NAME, proxy):
+            print('Successfully Set Proxy', proxy)
 
     def adsl(self):
         while True:

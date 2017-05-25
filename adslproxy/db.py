@@ -13,7 +13,6 @@ class RedisClient(object):
     
     def set(self, name, proxy):
         print(name, proxy)
-
         return self.db.set(self.key(name), proxy)
 
     def get(self, name):
@@ -44,5 +43,3 @@ class RedisClient(object):
 
     def first(self):
         return self.get(self.keys()[0])
-
-

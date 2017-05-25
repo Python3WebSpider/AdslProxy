@@ -31,9 +31,6 @@ PROXY_KEY = 'adsl'
 # 测试URL
 TEST_URL = 'http://www.baidu.com'
 
-# 测试代理命令
-TEST_PROXY_BASH = 'curl -x 127.0.0.1 ' + TEST_URL
-
 # 测试超时时间
 TEST_TIMEOUT = 20
 
