@@ -40,6 +40,7 @@ class Sender():
                         }, timeout=TEST_TIMEOUT)
                         if response.status_code == 200:
                             self.redis.set(CLIENT_NAME, proxy)
+                            print('Valid Proxy', proxy)
                             time.sleep(ADSL_CYCLE)
                     except (ConnectionError, ReadTimeout):
                         print('Invalid Proxy, Re Dialing')
