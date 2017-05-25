@@ -24,7 +24,7 @@ class Sender():
     def test_proxy(self):
         try:
             response = requests.get(TEST_URL, proxies={
-                'http': 'http://127.0.0.1' + str(PROXY_PORT)
+                'http': 'http://127.0.0.1:' + str(PROXY_PORT)
             }, timeout=TEST_TIMEOUT)
             if response.status_code == 200:
                 return True
