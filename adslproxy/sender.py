@@ -38,7 +38,7 @@ class Sender():
                         response = requests.get(TEST_URL, proxies={
                             'http': 'http://' + proxy,
                             'https': 'https://' + proxy
-                        }, timeout=10)
+                        }, timeout=TEST_TIMEOUT)
                         if response.status_code == 200:
                             self.redis.set(CLIENT_NAME, proxy)
                             time.sleep(ADSL_CYCLE)

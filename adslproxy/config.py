@@ -31,5 +31,8 @@ PROXY_KEY = 'adsl'
 # 测试URL
 TEST_URL = 'http://www.baidu.com'
 
+# 测试超时时间
+TEST_TIMEOUT = 20
+
 # API端口
 API_PORT = 8000
