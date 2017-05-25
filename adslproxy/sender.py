@@ -50,7 +50,7 @@ class Sender():
                     proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
                     if self.test_proxy(proxy):
                         print('Valid Proxy')
-                        self.set_proxy()
+                        self.set_proxy(proxy)
                         time.sleep(ADSL_CYCLE)
                     else:
                         print('Invalid Proxy')
