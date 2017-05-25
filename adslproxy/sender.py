@@ -36,8 +36,7 @@ class Sender():
                         proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
                         print('Proxy', proxy)
                         response = requests.get(TEST_URL, proxies={
-                            'http': 'http://' + proxy,
-                            'https': 'https://' + proxy
+                            'http': 'http://' + proxy
                         }, timeout=TEST_TIMEOUT)
                         if response.status_code == 200:
                             self.redis.set(CLIENT_NAME, proxy)
