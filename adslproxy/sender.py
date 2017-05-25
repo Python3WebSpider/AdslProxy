@@ -21,6 +21,16 @@ class Sender():
                 ip = result.group(1)
                 return ip
 
+    def test_proxy(self):
+        try:
+            response = requests.get(TEST_URL, proxies={
+                'http': 'http://127.0.0.1' + str(PROXY_PORT)
+            }, timeout=TEST_TIMEOUT)
+            if response.status_code == 200:
+                return True
+        except (ConnectionError, ReadTimeout):
+            return False
+
     def adsl(self):
         while True:
             print('ADSL Start, Remove Proxy, Please wait')
@@ -31,19 +41,12 @@ class Sender():
                 ip = self.get_ip()
                 if ip:
                     print('Now IP', ip)
-                    try:
-                        print('Testing Proxy, Please Wait')
-                        proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
-                        print('Proxy', proxy)
-                        response = requests.get(TEST_URL, proxies={
-                            'http': 'http://' + proxy
-                        }, timeout=TEST_TIMEOUT)
-                        if response.status_code == 200:
-                            self.redis.set(CLIENT_NAME, proxy)
-                            print('Valid Proxy', proxy)
-                            time.sleep(ADSL_CYCLE)
-                    except (ConnectionError, ReadTimeout):
-                        print('Invalid Proxy, Re Dialing')
+                    print('Testing Proxy, Please Wait')
+                    if self.test_proxy():
+                        print('Valid Proxy')
+                        time.sleep(ADSL_CYCLE)
+                    else:
+                        print('Invalid Proxy')
                 else:
                     print('Get IP Failed, Re Dialing')
                     time.sleep(ADSL_ERROR_CYCLE)
