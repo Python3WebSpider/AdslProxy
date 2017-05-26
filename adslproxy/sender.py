@@ -6,7 +6,6 @@ from adslproxy.db import RedisClient
 from adslproxy.config import *
 import platform
 
-
 if platform.python_version().startswith('2.'):
     import commands as subprocess
 elif platform.python_version().startswith('3.'):
@@ -28,7 +27,8 @@ class Sender():
     def test_proxy(self, proxy):
         try:
             response = requests.get(TEST_URL, proxies={
-                'http': 'http://' + proxy
+                'http': 'http://' + proxy,
+                'https': 'https://' + proxy
             }, timeout=TEST_TIMEOUT)
             if response.status_code == 200:
                 return True
