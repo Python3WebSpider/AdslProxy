@@ -27,10 +27,10 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # 代理池键名
-PROXY_KEY = 'localhost'
+PROXY_KEY = 'ads1'
 
 # 测试URL
-TEST_URL = 'http://www.baidu.com'
+TEST_URL = 'https://www.baidu.com'
 
 # 测试超时时间
 TEST_TIMEOUT = 20
