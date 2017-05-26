@@ -15,7 +15,6 @@ else:
     raise ValueError('python version must be 2 or 3')
 
 
-
 class Sender():
     def get_ip(self, ifname=ADSL_IFNAME):
         (status, output) = subprocess.getstatusoutput('ifconfig')
