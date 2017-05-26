@@ -27,7 +27,7 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # 代理池键名
-PROXY_KEY = 'ads1'
+PROXY_KEY = 'adsl'
 
 # 测试URL
 TEST_URL = 'https://www.baidu.com'
