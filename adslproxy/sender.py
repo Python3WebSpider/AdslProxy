@@ -1,11 +1,19 @@
 import re
-import subprocess
 import time
 import requests
 from requests.exceptions import ConnectionError, ReadTimeout
-
 from adslproxy.db import RedisClient
 from adslproxy.config import *
+import platform
+
+
+if platform.python_version().startswith('2.'):
+    import commands as subprocess
+elif platform.python_version().startswith('3.'):
+    import subprocess
+else:
+    raise ValueError('python version must be 2 or 3')
+
 
 
 class Sender():
