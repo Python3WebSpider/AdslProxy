@@ -1,5 +1,6 @@
+# coding:utf-8
 # 拨号间隔
-ADSL_CYCLE = 100
+ADSL_CYCLE = 30
 
 # 拨号出错重试间隔
 ADSL_ERROR_CYCLE = 5
@@ -26,10 +27,10 @@ REDIS_PASSWORD = None
 REDIS_PORT = 6379
 
 # 代理池键名
-PROXY_KEY = 'adsl'
+PROXY_KEY = 'ads1'
 
 # 测试URL
-TEST_URL = 'http://www.baidu.com'
+TEST_URL = 'https://www.baidu.com'
 
 # 测试超时时间
 TEST_TIMEOUT = 20
