@@ -5,7 +5,8 @@ from requests.exceptions import ConnectionError, ReadTimeout
 from adslproxy.db import RedisClient
 from adslproxy.config import *
 import platform
-
+import warnings
+warnings.filterwarnings("ignore")
 
 if platform.python_version().startswith('2.'):
     import commands as subprocess
@@ -29,7 +30,7 @@ class Sender():
         try:
             response = requests.get(TEST_URL, proxies={
                 'http': 'http://' + proxy
-            }, timeout=TEST_TIMEOUT)
+            }, timeout=TEST_TIMEOUT,verify=False)
             if response.status_code == 200:
                 return True
         except (ConnectionError, ReadTimeout):
