@@ -263,7 +263,7 @@ def get_random_proxy():
 ```python
 import requests
 proxies  = {
-  'http': 'http://' + get_random_proxy(),
+  'http': 'http://' + get_random_proxy()
 }
 r = requests.get('http://httpbin.org/get', proxies=proxies)
 print(r.text)
