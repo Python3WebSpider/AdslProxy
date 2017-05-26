@@ -4,15 +4,14 @@ from adslproxy.config import *
 
 
 class RedisClient(object):
-    def __init__(self, host=REDIS_HOST, port=REDIS_PORT):
-        self.db = redis.Redis(host=host, port=port, password=REDIS_PASSWORD)
-        self.proxy_key = PROXY_KEY
+    def __init__(self, host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, proxy_key=PROXY_KEY):
+        self.db = redis.Redis(host=host, port=port, password=password)
+        self.proxy_key = proxy_key
     
     def key(self, name):
         return '{key}:{name}'.format(key=self.proxy_key, name=name)
     
     def set(self, name, proxy):
-        print(name, proxy)
         return self.db.set(self.key(name), proxy)
 
     def get(self, name):

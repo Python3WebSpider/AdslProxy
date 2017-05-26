@@ -1,4 +1,6 @@
-from adslproxy.api import run
+from adslproxy.api import server
+from adslproxy.db import RedisClient
 
 if __name__ == '__main__':
-    run()
+    redis = RedisClient()
+    server(redis=redis)
