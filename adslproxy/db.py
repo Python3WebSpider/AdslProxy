@@ -5,40 +5,73 @@ from adslproxy.config import *
 
 class RedisClient(object):
     def __init__(self, host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, proxy_key=PROXY_KEY):
-        self.db = redis.Redis(host=host, port=port, password=password)
+        """
+        初始化Redis连接
+        :param host: Redis 地址
+        :param port: Redis 端口
+        :param password: Redis 密码
+        :param proxy_key: Redis 哈希表名
+        """
+        self.db = redis.StrictRedis(host=host, port=port, password=password, decode_responses=True)
         self.proxy_key = proxy_key
     
-    def key(self, name):
-        return '{key}:{name}'.format(key=self.proxy_key, name=name)
-    
     def set(self, name, proxy):
-        return self.db.set(self.key(name), proxy)
-
+        """
+        设置代理
+        :param name: 主机名称
+        :param proxy: 代理
+        :return: 设置结果
+        """
+        return self.db.hset(self.proxy_key, name, proxy)
+    
     def get(self, name):
-        return self.db.get(self.key(name)).decode('utf-8')
-
+        """
+        获取代理
+        :param name: 主机名称
+        :return: 代理
+        """
+        return self.db.hget(self.proxy_key, name)
+    
     def count(self):
-        return len(self.db.keys(self.key('*')))
+        """
+        获取代理总数
+        :return: 代理总数
+        """
+        return self.db.hlen(self.proxy_key)
     
     def remove(self, name):
-        return self.db.delete(self.key(name))
-
-    def keys(self):
-        return [key.decode('utf-8').replace(self.proxy_key + ':', '') for key in self.db.keys(self.key('*'))]
-
-    def all(self):
-        keys = self.keys()
-        proxies = [{'name': key, 'proxy': self.get(key)} for key in keys]
-        return proxies
-
+        """
+        删除代理
+        :param name: 主机名称
+        :return: 删除结果
+        """
+        return self.db.hdel(self.proxy_key, name)
+    
+    def names(self):
+        """
+        获取主机名称列表
+        :return: 获取主机名称列表
+        """
+        return self.db.hkeys(self.proxy_key)
+    
+    def proxies(self):
+        """
+        获取代理列表
+        :return: 代理列表
+        """
+        return self.db.hvals(self.proxy_key)
+    
     def random(self):
-        items = self.all()
-        return random.choice(items).get('proxy')
-
-    def list(self):
-        keys = self.keys()
-        proxies = [self.get(key) for key in keys]
-        return proxies
-
-    def first(self):
-        return self.get(self.keys()[0])
+        """
+        随机获取代理
+        :return:
+        """
+        proxies = self.proxies()
+        return random.choice(proxies)
+    
+    def all(self):
+        """
+        获取字典
+        :return:
+        """
+        return self.db.hgetall(self.proxy_key)

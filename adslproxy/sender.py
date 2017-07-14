@@ -16,6 +16,11 @@ else:
 
 class Sender():
     def get_ip(self, ifname=ADSL_IFNAME):
+        """
+        获取本机IP
+        :param ifname: 网卡名称
+        :return:
+        """
         (status, output) = subprocess.getstatusoutput('ifconfig')
         if status == 0:
             pattern = re.compile(ifname + '.*?inet.*?(\d+\.\d+\.\d+\.\d+).*?netmask', re.S)
@@ -25,6 +30,11 @@ class Sender():
                 return ip
 
     def test_proxy(self, proxy):
+        """
+        测试代理
+        :param proxy: 代理
+        :return: 测试结果
+        """
         try:
             response = requests.get(TEST_URL, proxies={
                 'http': 'http://' + proxy,
@@ -36,16 +46,29 @@ class Sender():
             return False
 
     def remove_proxy(self):
+        """
+        移除代理
+        :return: None
+        """
         self.redis = RedisClient()
         self.redis.remove(CLIENT_NAME)
         print('Successfully Removed Proxy')
 
     def set_proxy(self, proxy):
+        """
+        设置代理
+        :param proxy: 代理
+        :return: None
+        """
         self.redis = RedisClient()
         if self.redis.set(CLIENT_NAME, proxy):
             print('Successfully Set Proxy', proxy)
 
     def adsl(self):
+        """
+        拨号主进程
+        :return: None
+        """
         while True:
             print('ADSL Start, Remove Proxy, Please wait')
             self.remove_proxy()

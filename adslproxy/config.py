@@ -21,7 +21,7 @@ ADSL_IFNAME = 'ppp0'
 REDIS_HOST = 'localhost'
 
 # Redis数据库密码, 如无则填None
-REDIS_PASSWORD = None
+REDIS_PASSWORD = 'foobared'
 
 # Redis数据库端口
 REDIS_PORT = 6379
