@@ -1,11 +1,9 @@
+# coding=utf-8
 import json
-
 import tornado.ioloop
 import tornado.web
 from tornado.web import RequestHandler, Application
 from adslproxy.config import *
-from adslproxy.db import RedisClient
-
 
 class MainHandler(RequestHandler):
     def initialize(self, redis):

@@ -1,4 +1,4 @@
-# coding:utf-8
+# coding=utf-8
 # 拨号间隔
 ADSL_CYCLE = 100
 
