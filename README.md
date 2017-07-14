@@ -157,20 +157,19 @@ pip3 install adslproxy
 ### 2.Redis直连使用
 
 ```python
-from adslproxy import RedisClient, server
+from adslproxy import RedisClient
 
-client = RedisClient(host='', password='', port='')
+client = RedisClient(host='', password='')
 random = client.random()
 all = client.all()
-first = client.first()
-keys = client.keys()
+names = client.names()
+proxies = client.proxies()
 count = client.count()
-
 
 print('RANDOM:', random)
 print('ALL:', all)
-print('FIRST:', first)
-print('KEYS:', keys)
+print('NAMES:', names)
+print('PROXIES:', proxies)
 print('COUNT:', count)
 ```
 
@@ -202,13 +201,13 @@ print('COUNT:', count)
 >
 > 从Redis代理池取所有可用代理，返回list
 >
-> #### first()
+> #### names()
 >
-> 从Redis代理池取第一个代理
+> 从Redis代理池取主机列表
 >
-> #### keys()
+> #### proxies()
 >
-> 从Redis代理池取所有主机名称
+> 从Redis代理池取代理列表
 >
 > #### count()
 >
@@ -217,11 +216,11 @@ print('COUNT:', count)
 运行结果：
 
 ```python
-RANDOM: 118.124.38.119:8888
-ALL: [{'name': 'adsl2', 'proxy': '112.84.20.161:8888'}, {'name': 'adsl1', 'proxy': '118.124.38.119:8888'}]
-FIRST: 112.84.20.161:8888
-KEYS: ['adsl2', 'adsl1']
-COUNT: 2
+RANDOM: 115.221.121.52:8888
+ALL: {'adsl2': '118.119.111.172:8888', 'adsl3': '115.221.121.52:8888', 'adsl4': '58.22.111.23:8888', 'adsl1': '182.147.200.60:8888'}
+NAMES: ['adsl2', 'adsl3', 'adsl4', 'adsl1']
+PROXIES: ['118.119.111.172:8888', '115.221.121.52:8888', '58.22.111.23:8888', '182.147.200.60:8888']
+COUNT: 4
 ```
 
 代码使用：
