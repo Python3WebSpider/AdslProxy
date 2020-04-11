@@ -1,0 +1,3 @@
+reqeusts
+redis==2.10.5
+tornado==4.4.3
