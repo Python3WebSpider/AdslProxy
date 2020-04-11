@@ -26,7 +26,7 @@ REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', 'foobared')
 
 # Redis数据库端口
-REDIS_PORT = int(os.getenv('REDIS_PORT', 'localhost'))
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 
 # 代理池键名
 PROXY_KEY = 'adsl'
