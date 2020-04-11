@@ -8,7 +8,7 @@ ADSL_CYCLE = 100
 ADSL_ERROR_CYCLE = 5
 
 # ADSL命令
-ADSL_BASH = 'pppoe-stop;adsl-start'
+ADSL_BASH = 'pppoe-stop;pppoe-start'
 
 # 代理运行端口
 PROXY_PORT = 8888
