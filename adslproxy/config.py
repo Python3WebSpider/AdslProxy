@@ -1,4 +1,6 @@
 # coding=utf-8
+import os
+
 # 拨号间隔
 ADSL_CYCLE = 100
 
@@ -12,19 +14,19 @@ ADSL_BASH = 'pppoe-stop;adsl-start'
 PROXY_PORT = 8888
 
 # 客户端唯一标识
-CLIENT_NAME = 'adsl1'
+CLIENT_NAME = os.getenv('CLIENT_NAME', 'adsl1')
 
 # 拨号网卡
 ADSL_IFNAME = 'ppp0'
 
 # Redis数据库IP
-REDIS_HOST = 'localhost'
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 
 # Redis数据库密码, 如无则填None
-REDIS_PASSWORD = 'foobared'
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', 'foobared')
 
 # Redis数据库端口
-REDIS_PORT = 6379
+REDIS_PORT = int(os.getenv('REDIS_PORT', 'localhost'))
 
 # 代理池键名
 PROXY_KEY = 'adsl'
