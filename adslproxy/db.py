@@ -1,7 +1,7 @@
 # coding=utf-8
 import redis
 import random
-from adslproxy.config import *
+from adslproxy.settings import *
 
 
 class RedisClient(object):
@@ -76,3 +76,10 @@ class RedisClient(object):
         :return:
         """
         return self.db.hgetall(self.proxy_key)
+    
+    def close(self):
+        """
+        关闭 Redis 连接
+        :return:
+        """
+        return self.db.close()

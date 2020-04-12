@@ -3,14 +3,29 @@ import json
 import tornado.ioloop
 import tornado.web
 from tornado.web import RequestHandler, Application
-from adslproxy.config import *
+from adslproxy.settings import *
+from loguru import logger
 
 
-class MainHandler(RequestHandler):
+class Server(RequestHandler):
+    """
+    服务器，对接 Redis 并提供 API
+    """
+    
     def initialize(self, redis):
+        """
+        初始化
+        :param redis:
+        :return:
+        """
         self.redis = redis
     
     def get(self, api=''):
+        """
+        API 列表
+        :param api:
+        :return:
+        """
         if not api:
             links = ['random', 'proxies', 'names', 'all', 'count']
             self.write('<h4>Welcome to ADSL Proxy API</h4>')
@@ -41,11 +56,15 @@ class MainHandler(RequestHandler):
             self.write(str(self.redis.count()))
 
 
-def server(redis, port=API_PORT, address=''):
+def serve(redis, port=SERVER_PORT, address=SERVER_HOST):
     application = Application([
-        (r'/', MainHandler, dict(redis=redis)),
-        (r'/(.*)', MainHandler, dict(redis=redis)),
+        (r'/', Server, dict(redis=redis)),
+        (r'/(.*)', Server, dict(redis=redis)),
     ])
     application.listen(port, address=address)
-    print('ADSL API Listening on', port)
+    logger.info('API Listening on', port)
     tornado.ioloop.IOLoop.instance().start()
+
+
+if __name__ == '__main__':
+    serve()

@@ -1,8 +1,9 @@
 # coding=utf-8
-__version__ = '2.0.0'
-from adslproxy.db import RedisClient
-from adslproxy.api import server
 
 def version():
-    return __version__
-
+    """
+    get version from version file
+    :return:
+    """
+    from adslproxy import __version__
+    return __version__.version()
