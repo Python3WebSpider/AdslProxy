@@ -61,7 +61,7 @@ class Sender(object):
         logger.info(f'Removing {CLIENT_NAME}...')
         try:
             # 由于拨号就会中断连接，所以每次都要重新建立连接
-            if self.redis:
+            if hasattr(self, 'redis') and self.redis:
                 self.redis.close()
             self.redis = RedisClient()
             self.redis.remove(CLIENT_NAME)
