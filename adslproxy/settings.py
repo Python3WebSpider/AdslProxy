@@ -39,3 +39,5 @@ SERVER_HOST = env.str('SERVER_HOST', '0.0.0.0')
 
 # 代理端口
 PROXY_PORT = env.int('PROXY_PORT', 3128)
+PROXY_USERNAME = env.str('PROXY_USERNAME', '')
+PROXY_PASSWORD = env.str('PROXY_PASSWORD', '')

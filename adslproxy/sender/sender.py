@@ -106,7 +106,12 @@ class Sender(object):
         ip = self.extract_ip()
         if ip:
             logger.info(f'Get New IP {ip}')
-            proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
+            if PROXY_USERNAME and PROXY_PASSWORD:
+                proxy = '{username}:{password}@{ip}:{port}'.format(username=PROXY_USERNAME,
+                                                                   password=PROXY_PASSWORD,
+                                                                   ip=ip, port=PROXY_PORT)
+            else:
+                proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
             time.sleep(5)
             if self.test_proxy(proxy):
                 logger.info(f'Valid proxy {proxy}')
