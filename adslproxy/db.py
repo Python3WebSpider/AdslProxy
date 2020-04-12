@@ -82,4 +82,4 @@ class RedisClient(object):
         关闭 Redis 连接
         :return:
         """
-        return self.db.close()
+        del self.db
