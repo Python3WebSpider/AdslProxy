@@ -5,7 +5,7 @@ from adslproxy.checker.checker import check
 from adslproxy.sender.sender import send
 from adslproxy.server.server import serve
 
-optional_title = 'Optional arguments'
+optional_title = 'optional arguments'
 
 
 def str2bool(v):
@@ -61,9 +61,9 @@ class CapitalisedHelpFormatter(argparse.HelpFormatter):
             if self.heading is not argparse.SUPPRESS and self.heading is not None:
                 current_indent = self.formatter._current_indent
                 if self.heading == optional_title:
-                    heading = '%*s%s:\n' % (current_indent, '', self.heading)
+                    heading = '%*s\n%s:\n' % (current_indent, '', self.heading.title())
                 else:
-                    heading = '%*s%s:' % (current_indent, '', self.heading)
+                    heading = '%*s%s:' % (current_indent, '', self.heading.title())
             else:
                 heading = ''
             
@@ -83,11 +83,11 @@ parser_serve = subparsers.add_parser('serve', help='Run Server')
 
 # check
 parser_check = subparsers.add_parser('check', help='Run Checker')
-parser_check.add_argument('-l', '--loop', default=False, type=str2bool, nargs='?', help='Run checker for infinite')
+parser_check.add_argument('-l', '--loop', default=True, type=str2bool, nargs='?', help='Run checker for infinite')
 
 # send
 parser_send = subparsers.add_parser('send', help='Run Sender')
-parser_send.add_argument('-l', '--loop', default=False, type=str2bool, nargs='?', help='Run sender for infinite')
+parser_send.add_argument('-l', '--loop', default=True, type=str2bool, nargs='?', help='Run sender for infinite')
 
 # show help info when no args
 if len(sys.argv[1:]) == 0:
@@ -102,6 +102,7 @@ def cmd():
     """
     args = parser.parse_args()
     command = args.command
+    print('args', args)
     # run server
     if command == 'serve':
         serve()
@@ -111,3 +112,7 @@ def cmd():
     # check proxies in redis
     elif command == 'check':
         check(args.loop)
+
+
+if __name__ == '__main__':
+    cmd()

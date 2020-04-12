@@ -119,7 +119,7 @@ class Sender(object):
             self.run()
 
 
-def send(loop=False):
+def send(loop=True):
     sender = Sender()
     sender.loop() if loop else sender.run()
 

@@ -2,8 +2,9 @@ import time
 from requests import ReadTimeout
 from adslproxy.db import RedisClient
 import requests
-from adslproxy.settings import *
+from adslproxy import settings
 from collections import defaultdict
+from loguru import logger
 
 
 class Checker(object):
@@ -19,36 +20,56 @@ class Checker(object):
         :return: 测试结果
         """
         try:
-            response = requests.get(TEST_URL, proxies={
+            response = requests.get(settings.TEST_URL, proxies={
                 'http': 'http://' + proxy,
                 'https': 'https://' + proxy
-            }, timeout=TEST_TIMEOUT)
+            }, timeout=settings.TEST_TIMEOUT)
+            logger.debug(f'Using {proxy} to test {settings.TEST_URL}...')
             if response.status_code == 200:
                 return True
         except (ConnectionError, ReadTimeout):
             return False
     
     def run(self):
+        """
+        测试一轮
+        :return:
+        """
         proxies = self.db.all()
-        for proxy in proxies:
+        logger.info(f'Try to get all proxies {proxies}')
+        for name, proxy in proxies.items():
             # 检测无效
             if not self.check(proxy):
+                logger.info(f'Proxy {proxy} invalid')
                 self.counts[proxy] += 1
-            if self.counts.get(proxy) > TEST_MAX_ERROR_COUNT:
-                self.db.remove(proxy)
+            else:
+                logger.info(f'Proxy {proxy} valid')
+            count = self.counts.get(proxy) or 0
+            logger.debug(f'Count {count}, TEST_MAX_ERROR_COUNT {settings.TEST_MAX_ERROR_COUNT}')
+            if count >= settings.TEST_MAX_ERROR_COUNT:
+                self.db.remove(name)
     
     def loop(self):
+        """
+        循环测试
+        :return:
+        """
         while True:
+            logger.info('Check for infinite')
             self.run()
-            time.sleep(TEST_CYCLE)
+            logger.info(f'Tested, sleeping for {settings.TEST_CYCLE}s...')
+            time.sleep(settings.TEST_CYCLE)
 
 
-def check(loop=False):
+def check(loop=True):
     """
     check proxies
     :param loop:
     :return:
     """
+    print('check', loop)
+    if not loop:
+        settings.TEST_MAX_ERROR_COUNT = 1
     checker = Checker()
     checker.loop() if loop else checker.run()
 

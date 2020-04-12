@@ -3,6 +3,7 @@ import json
 import tornado.ioloop
 import tornado.web
 from tornado.web import RequestHandler, Application
+from adslproxy.db import RedisClient
 from adslproxy.settings import *
 from loguru import logger
 
@@ -56,13 +57,15 @@ class Server(RequestHandler):
             self.write(str(self.redis.count()))
 
 
-def serve(redis, port=SERVER_PORT, address=SERVER_HOST):
+def serve(redis=None, port=SERVER_PORT, address=SERVER_HOST):
+    if not redis:
+        redis = RedisClient()
     application = Application([
         (r'/', Server, dict(redis=redis)),
         (r'/(.*)', Server, dict(redis=redis)),
     ])
     application.listen(port, address=address)
-    logger.info('API Listening on', port)
+    logger.info(f'API Listening on http://{address}:{port}')
     tornado.ioloop.IOLoop.instance().start()
 
 

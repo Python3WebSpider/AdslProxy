@@ -5,16 +5,16 @@ from adslproxy.settings import *
 
 
 class RedisClient(object):
-    def __init__(self, host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, proxy_key=PROXY_KEY):
+    def __init__(self, host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, redis_key=REDIS_KEY):
         """
         初始化Redis连接
         :param host: Redis 地址
         :param port: Redis 端口
         :param password: Redis 密码
-        :param proxy_key: Redis 哈希表名
+        :param redis_key: Redis 哈希表名
         """
         self.db = redis.StrictRedis(host=host, port=port, password=password, decode_responses=True)
-        self.proxy_key = proxy_key
+        self.redis_key = redis_key
     
     def set(self, name, proxy):
         """
@@ -23,7 +23,7 @@ class RedisClient(object):
         :param proxy: 代理
         :return: 设置结果
         """
-        return self.db.hset(self.proxy_key, name, proxy)
+        return self.db.hset(self.redis_key, name, proxy)
     
     def get(self, name):
         """
@@ -31,14 +31,14 @@ class RedisClient(object):
         :param name: 主机名称
         :return: 代理
         """
-        return self.db.hget(self.proxy_key, name)
+        return self.db.hget(self.redis_key, name)
     
     def count(self):
         """
         获取代理总数
         :return: 代理总数
         """
-        return self.db.hlen(self.proxy_key)
+        return self.db.hlen(self.redis_key)
     
     def remove(self, name):
         """
@@ -46,21 +46,21 @@ class RedisClient(object):
         :param name: 主机名称
         :return: 删除结果
         """
-        return self.db.hdel(self.proxy_key, name)
+        return self.db.hdel(self.redis_key, name)
     
     def names(self):
         """
         获取主机名称列表
         :return: 获取主机名称列表
         """
-        return self.db.hkeys(self.proxy_key)
+        return self.db.hkeys(self.redis_key)
     
     def proxies(self):
         """
         获取代理列表
         :return: 代理列表
         """
-        return self.db.hvals(self.proxy_key)
+        return self.db.hvals(self.redis_key)
     
     def random(self):
         """
@@ -75,7 +75,7 @@ class RedisClient(object):
         获取字典
         :return:
         """
-        return self.db.hgetall(self.proxy_key)
+        return self.db.hgetall(self.redis_key)
     
     def close(self):
         """
