@@ -102,7 +102,6 @@ def cmd():
     """
     args = parser.parse_args()
     command = args.command
-    print('args', args)
     # run server
     if command == 'serve':
         serve()
