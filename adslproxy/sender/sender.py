@@ -8,6 +8,7 @@ from adslproxy.settings import *
 import platform
 from loguru import logger
 from retrying import retry
+import redis
 
 if platform.python_version().startswith('2.'):
     import commands as subprocess
@@ -52,7 +53,7 @@ class Sender(object):
         except (ConnectionError, ReadTimeout):
             return False
     
-    @retry(retry_on_result=lambda x: x is not True)
+    @retry(retry_on_result=lambda x: x is not True, stop_max_attempt_number=3)
     def remove_proxy(self):
         """
         移除代理
@@ -67,7 +68,7 @@ class Sender(object):
             self.redis.remove(CLIENT_NAME)
             logger.info(f'Removed {CLIENT_NAME} successfully')
             return True
-        except:
+        except redis.ConnectionError:
             logger.info(f'Remove {CLIENT_NAME} failed')
     
     def set_proxy(self, proxy):
