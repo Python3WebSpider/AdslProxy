@@ -1,269 +1,57 @@
 ## 拨号主机设置
 
-### 1.拨号上网
+首先配置好代理，如使用 Squid，运行在 3128 端口，并设置好用户名和密码。
 
-根据云主机拨号教程拨号上网，示例命令：
+配置好代理之后，即可使用本工具定时拨号并发送至 Redis。
 
-```
-sh ppp.sh
-adsl-start
-```
-
-### 2.配置代理
-
-以CentOS上TinyProxy为例：
-
-#### 安装
+### 安装 ADSLProxy
 
 ```
-yum install -y epel-release
-yum update -y
-yum install -y tinyproxy
+pip3 install -U adslproxy
 ```
 
-#### 配置
+### 设置环境变量
 
 ```
-vi /etc/tinyproxy/tinyproxy.conf
+# Redis 数据库地址和密码
+export REDIS_HOST=
+export REDIS_PASSWORD=
+# 本机配置的代理端口
+export PROXY_PORT=
+# 本机配置的代理用户名，无认证则留空
+export PROXY_USERNAME=
+# 本机配置的代理密码，无认证则留空
+export PROXY_PASSWORD=
 ```
 
-取消注释
+### 执行
 
 ```
-Allow 127.0.0.1
+adslproxy send
 ```
-
-#### 启动
-
-```
-systemctl enable tinyproxy.service
-systemctl restart  tinyproxy.service
-```
-
-#### 测试
-
-```
-curl -x IP:PORT www.baidu.com
-```
-
-IP为拨号主机IP，PORT为代理端口
-
-#### 防火墙
-
-如不能访问可能是防火墙问题，可以放行端口
-
-```
-iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
-```
-
-或直接关闭防火墙
-
-```
-systemctl stop firewalld.service
-```
-
-### 3.安装Python3
-
-#### CentOS
-
-```
-sudo yum groupinstall -y development tools
-sudo yum install -y epel-release python34-devel  libxslt-devel libxml2-devel openssl-devel
-sudo yum install -y python34 python34-setuptools
-sudo easy_install-3.4 pip
-```
-
-#### Ubuntu
-
-```
-sudo apt-get install -y python3-dev build-essential libssl-dev libffi-dev libxml2 libxml2-dev libxslt1-dev zlib1g-dev
-sudo apt-get install -y python3 python3-pip
-```
-
-### 4.安装库
-
-```
-pip3 install redis tornado requests
-```
-
-### 5.Clone项目
-
-```
-git clone https://github.com/Python3WebSpider/AdslProxy.git
-```
-
-### 6.Redis
-
-Redis数据库可以配置在某台固定IP的VPS，也可以购买Redis独立服务，如阿里云、腾讯云等。
-
-### 7.修改配置
-
-配置文件是 adslproxy/config.py
-
-根据注释修改配置文件，主要修改要点如下：
-
-> #### ADSL_BASH
->
-> 拨号命令，不同主机可能不同，默认 adsl-stop;adsl-start
->
-> #### PROXY_PORT
->
-> 拨号主机代理端口，使用TinyProxy则默认为8888，使用Squid则默认3128，默认8888
->
-> #### CLIENT_NAME
->
-> 客户端唯一标识，不同拨号主机请设置不同的名称，默认adsl1
->
-> #### ADSL_IFNAME 
->
-> 拨号网卡名称，主要根据`ifconfig`命令获取拨号后该网卡的IP，默认ppp0
->
-> #### REDIS_HOST
->
-> Redis数据库地址，请修改为固定IP的Redis Host，默认localhost
->
-> #### REDIS_PASSWORD
->
-> Redis数据库密码，如无则填None，默认None
->
-> #### REDIS_PORT
->
-> Redis数据库端口，默认6379
->
-> #### PROXY_KEY
->
-> Redis代理池键名开头，默认为adsl
-
-### 8.运行
-
-```
-python3 run.py
-```
-
-守护运行
-
-```
-(python3 run.py > /dev/null &)
-```
-
-## 程序使用
-
-### 1.安装ADSLProxy
-
-```
-pip3 install adslproxy
-```
-
-### 2.Redis直连使用
-
-```python
-from adslproxy import RedisClient
-
-client = RedisClient(host='', password='')
-random = client.random()
-all = client.all()
-names = client.names()
-proxies = client.proxies()
-count = client.count()
-
-print('RANDOM:', random)
-print('ALL:', all)
-print('NAMES:', names)
-print('PROXIES:', proxies)
-print('COUNT:', count)
-```
-
-参数说明如下：
-
-> #### host
->
-> 即Redis数据库IP，默认localhost
->
-> #### password
->
-> 即Redis数据库密码，默认None
->
-> #### port
->
-> 即Redis数据库端口，默认6379
->
-> #### proxy_key
->
-> 即Redis数据库代理键名开头，默认adsl
-
-方法说明如下：
-
-> #### random()
->
-> 从Redis代理池取随机代理
->
-> #### all()
->
-> 从Redis代理池取所有可用代理，返回list
->
-> #### names()
->
-> 从Redis代理池取主机列表
->
-> #### proxies()
->
-> 从Redis代理池取代理列表
->
-> #### count()
->
-> 从Redis代理池取所有可用主机数量
 
 运行结果：
 
-```python
-RANDOM: 115.221.121.52:8888
-ALL: {'adsl2': '118.119.111.172:8888', 'adsl3': '115.221.121.52:8888', 'adsl4': '58.22.111.23:8888', 'adsl1': '182.147.200.60:8888'}
-NAMES: ['adsl2', 'adsl3', 'adsl4', 'adsl1']
-PROXIES: ['118.119.111.172:8888', '115.221.121.52:8888', '58.22.111.23:8888', '182.147.200.60:8888']
-COUNT: 4
+```
+2020-04-13 01:39:30.811 | INFO     | adslproxy.sender.sender:loop:90 - Starting dial...
+2020-04-13 01:39:30.812 | INFO     | adslproxy.sender.sender:run:99 - Dial Started, Remove Proxy
+2020-04-13 01:39:30.812 | INFO     | adslproxy.sender.sender:remove_proxy:62 - Removing adsl1...
+2020-04-13 01:39:30.893 | INFO     | adslproxy.sender.sender:remove_proxy:69 - Removed adsl1 successfully
+2020-04-13 01:39:37.034 | INFO     | adslproxy.sender.sender:run:108 - Get New IP 113.128.9.239
+2020-04-13 01:39:42.221 | INFO     | adslproxy.sender.sender:run:117 - Valid proxy 113.128.9.239:3389
+2020-04-13 01:39:42.458 | INFO     | adslproxy.sender.sender:set_proxy:82 - Successfully Set Proxy
+2020-04-13 01:43:02.560 | INFO     | adslproxy.sender.sender:loop:90 - Starting dial...
+2020-04-13 01:43:02.561 | INFO     | adslproxy.sender.sender:run:99 - Dial Started, Remove Proxy
+2020-04-13 01:43:02.561 | INFO     | adslproxy.sender.sender:remove_proxy:62 - Removing adsl1...
+2020-04-13 01:43:02.630 | INFO     | adslproxy.sender.sender:remove_proxy:69 - Removed adsl1 successfully
+2020-04-13 01:43:08.770 | INFO     | adslproxy.sender.sender:run:108 - Get New IP 113.128.31.230
+2020-04-13 01:43:13.955 | INFO     | adslproxy.sender.sender:run:117 - Valid proxy 113.128.31.230:3389
+2020-04-13 01:43:14.037 | INFO     | adslproxy.sender.sender:set_proxy:82 - Successfully Set Proxy
+2020-04-13 01:46:34.216 | INFO     | adslproxy.sender.sender:loop:90 - Starting dial...
+2020-04-13 01:46:34.217 | INFO     | adslproxy.sender.sender:run:99 - Dial Started, Remove Proxy
+2020-04-13 01:46:34.217 | INFO     | adslproxy.sender.sender:remove_proxy:62 - Removing adsl1...
+2020-04-13 01:46:34.298 | INFO     | adslproxy.sender.sender:remove_proxy:69 - Removed adsl1 successfully
 ```
 
-代码使用：
+此时有效代理就会发送到 Redis。
 
-```python
-import requests
-proxies  = {
-  'http': 'http://' + client.random()
-}
-r = requests.get('http://httpbin.org/get', proxies=proxies)
-print(r.text)
-```
-
-### 3.API使用
-
-```python
-from adslproxy import RedisClient, server
-client = RedisClient(host='', password='', port='')
-server(client, port=8000)
-```
-
-运行后会在8000端口监听，访问API即可取到相应代理
-
-获取代理：
-
-```python
-import requests
-
-def get_random_proxy():
-    try:
-        url = 'http://localhost:8000/random'
-        return requests.get(url).text
-    except requests.exceptions.ConnectionError:
-        return None
-```
-
-代码使用：
-
-```python
-import requests
-proxies  = {
-  'http': 'http://' + get_random_proxy()
-}
-r = requests.get('http://httpbin.org/get', proxies=proxies)
-print(r.text)
-```
