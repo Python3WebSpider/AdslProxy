@@ -5,6 +5,35 @@
 配置好代理之后，即可使用本工具定时拨号并发送至 Redis。
 
 ### 安装 ADSLProxy
+<<<<<<< HEAD
+
+```
+pip3 install -U adslproxy
+```
+
+### 设置环境变量
+
+```
+# Redis 数据库地址和密码
+export REDIS_HOST=
+export REDIS_PASSWORD=
+# 本机配置的代理端口
+export PROXY_PORT=
+# 本机配置的代理用户名，无认证则留空
+export PROXY_USERNAME=
+# 本机配置的代理密码，无认证则留空
+export PROXY_PASSWORD=
+```
+
+### 执行
+
+```
+adslproxy send
+```
+
+运行结果：
+
+=======
 
 ```
 pip3 install -U adslproxy
