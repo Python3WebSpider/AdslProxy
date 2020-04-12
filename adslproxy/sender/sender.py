@@ -79,7 +79,7 @@ class Sender(object):
         """
         self.redis = RedisClient()
         if self.redis.set(CLIENT_NAME, proxy):
-            logger.info('Successfully Set Proxy', proxy)
+            logger.info(f'Successfully Set Proxy {proxy}')
     
     def loop(self):
         """
