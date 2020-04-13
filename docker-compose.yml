@@ -1,0 +1,13 @@
+version: '3'
+services:
+  adslproxy:
+    build: .
+    image: 'germey/adslproxy'
+    container_name: adslproxy
+    command: adslproxy serve
+    ports:
+      - "8425:8425"
+    restart: always
+    environment:
+      REDIS_HOST:
+      REDIS_PASSWORD:
