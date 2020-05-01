@@ -67,7 +67,6 @@ def check(loop=True):
     :param loop:
     :return:
     """
-    print('check', loop)
     if not loop:
         settings.TEST_MAX_ERROR_COUNT = 1
     checker = Checker()

@@ -7,7 +7,7 @@ from adslproxy.db import RedisClient
 from adslproxy.settings import *
 import platform
 from loguru import logger
-from retrying import retry
+from retrying import retry, RetryError
 import redis
 
 if platform.python_version().startswith('2.'):
@@ -53,7 +53,7 @@ class Sender(object):
         except (ConnectionError, ReadTimeout):
             return False
     
-    @retry(retry_on_result=lambda x: x is not True, stop_max_attempt_number=3)
+    @retry(retry_on_result=lambda x: x is not True, stop_max_attempt_number=10)
     def remove_proxy(self):
         """
         移除代理
@@ -79,7 +79,7 @@ class Sender(object):
         """
         self.redis = RedisClient()
         if self.redis.set(CLIENT_NAME, proxy):
-            logger.info(f'Successfully Set Proxy {proxy}')
+            logger.info(f'Successfully set proxy {proxy}')
     
     def loop(self):
         """
@@ -96,16 +96,19 @@ class Sender(object):
         拨号主进程
         :return: None
         """
-        logger.info('Dial Started, Remove Proxy')
-        self.remove_proxy()
+        logger.info('Dial started, remove proxy')
+        try:
+            self.remove_proxy()
+        except RetryError:
+            logger.error('Retried for max times, continue')
         # 拨号
         (status, output) = subprocess.getstatusoutput(DIAL_BASH)
         if not status == 0:
-            logger.error('Dial Failed')
+            logger.error('Dial failed')
         # 获取拨号 IP
         ip = self.extract_ip()
         if ip:
-            logger.info(f'Get New IP {ip}')
+            logger.info(f'Get new IP {ip}')
             if PROXY_USERNAME and PROXY_PASSWORD:
                 proxy = '{username}:{password}@{ip}:{port}'.format(username=PROXY_USERNAME,
                                                                    password=PROXY_PASSWORD,
@@ -119,10 +122,10 @@ class Sender(object):
                 self.set_proxy(proxy)
                 time.sleep(DIAL_CYCLE)
             else:
-                logger.error(f'Proxy Invalid {proxy}')
+                logger.error(f'Proxy invalid {proxy}')
         else:
             # 获取 IP 失败，重新拨号
-            logger.error('Get IP Failed, Re Dialing')
+            logger.error('Get IP failed, re-dialing')
             self.run()
 
 

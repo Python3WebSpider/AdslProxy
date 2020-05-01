@@ -65,7 +65,7 @@ def serve(redis=None, port=SERVER_PORT, address=SERVER_HOST):
         (r'/(.*)', Server, dict(redis=redis)),
     ])
     application.listen(port, address=address)
-    logger.info(f'API Listening on http://{address}:{port}')
+    logger.info(f'API listening on http://{address}:{port}')
     tornado.ioloop.IOLoop.instance().start()
 
 
