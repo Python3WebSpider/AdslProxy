@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o deployment.yml
+    kompose.version: 1.20.0 ()
+  creationTimestamp: null
+  labels:
+    app: adslproxy-checker
+  name: adslproxy-checker
+  namespace: adslproxy
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      app: adslproxy-checker
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o deployment.yml
+        kompose.version: 1.20.0 ()
+      creationTimestamp: null
+      labels:
+        app: adslproxy-checker
+    spec:
+      containers:
+        - resources:
+            requests:
+              memory: "300Mi"
+              cpu: "0.2"
+            limits:
+              memory: "300Mi"
+              cpu: "0.2"
+          args:
+            - adslproxy
+            - check
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: host
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: password
+          image: germey/adslproxy
+          name: adslproxy-checker
+      restartPolicy: Always

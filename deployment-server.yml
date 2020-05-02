@@ -8,8 +8,8 @@ items:
         kompose.version: 1.20.0 ()
       creationTimestamp: null
       labels:
-        app: adslproxy
-      name: adslproxy
+        app: adslproxy-server
+      name: adslproxy-server
       namespace: adslproxy
     spec:
       ports:
@@ -17,7 +17,7 @@ items:
           port: 8425
           targetPort: 8425
       selector:
-        app: adslproxy
+        app: adslproxy-server
     status:
       loadBalancer: {}
   - apiVersion: apps/v1
@@ -28,15 +28,15 @@ items:
         kompose.version: 1.20.0 ()
       creationTimestamp: null
       labels:
-        app: adslproxy
-      name: adslproxy
+        app: adslproxy-server
+      name: adslproxy-server
       namespace: adslproxy
     spec:
       replicas: 1
       strategy: {}
       selector:
         matchLabels:
-          app: adslproxy
+          app: adslproxy-server
       template:
         metadata:
           annotations:
@@ -44,10 +44,17 @@ items:
             kompose.version: 1.20.0 ()
           creationTimestamp: null
           labels:
-            app: adslproxy
+            app: adslproxy-server
         spec:
           containers:
-            - args:
+            - resources:
+                requests:
+                  memory: "300Mi"
+                  cpu: "0.2"
+                limits:
+                  memory: "300Mi"
+                  cpu: "0.2"
+              args:
                 - adslproxy
                 - serve
               env:
@@ -62,10 +69,9 @@ items:
                       name: redis
                       key: password
               image: germey/adslproxy
-              name: adslproxy
+              name: adslproxy-server
               ports:
                 - containerPort: 8425
-              resources: {}
           restartPolicy: Always
     status: {}
 kind: List
@@ -81,11 +87,15 @@ metadata:
     nginx.ingress.kubernetes.io/auth-secret: basic-auth
     nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
 spec:
+  tls:
+    - hosts:
+        - adslproxy.cuiqingcai.com
+      secretName: tls-adslproxy-cuiqingcai-com
   rules:
     - host: adslproxy.cuiqingcai.com
       http:
         paths:
           - backend:
-              serviceName: adslproxy
+              serviceName: adslproxy-server
               servicePort: 8425
             path: /
