@@ -1,4 +1,5 @@
 # coding=utf-8
+# 放入Redis之前加了一个时间戳，方便判断IP存活时间
 import redis
 import random
 from adslproxy.settings import *
@@ -23,7 +24,7 @@ class RedisClient(object):
         :param proxy: 代理
         :return: 设置结果
         """
-        return self.db.hset(self.redis_key, name, proxy)
+        return self.db.hset(self.redis_key, name, proxy + '_' + str(int(time.time())))
     
     def get(self, name):
         """
