@@ -1,4 +1,8 @@
 # coding=utf-8
+# 采用了新的proxy验证方式,ping一次速度更快
+# 修正了原来版本的几个小bug，比如拨号间隔原来实际上是设定值的两倍，如果proxy无效等待时间太长（改成6秒或者其他最低拨号间隔即可)
+# IP与上次的相同会自动再次拨号
+
 import re
 import time
 import requests
@@ -9,6 +13,8 @@ import platform
 from loguru import logger
 from retrying import retry, RetryError
 import redis
+import datetime
+import os
 
 if platform.python_version().startswith('2.'):
     import commands as subprocess
@@ -22,7 +28,7 @@ class Sender(object):
     """
     拨号并发送到 Redis
     """
-    
+    ip_pre = ''
     def extract_ip(self):
         """
         获取本机IP
@@ -42,15 +48,26 @@ class Sender(object):
         测试代理，返回测试结果
         :param proxy: 代理
         :return: 测试结果
+        :ping一次测试速度更快，只需要几十毫秒
         """
-        try:
-            response = requests.get(TEST_URL, proxies={
-                'http': 'http://' + proxy,
-                'https': 'https://' + proxy
-            }, timeout=TEST_TIMEOUT)
-            if response.status_code == 200:
-                return True
-        except (ConnectionError, ReadTimeout):
+        # try:
+            # response = requests.get(TEST_URL, proxies={
+                # 'http': 'http://' + proxy,
+                # 'https': 'https://' + proxy
+            # }, timeout=TEST_TIMEOUT)
+            # if response.status_code == 200:
+                # return True
+        # except (ConnectionError, ReadTimeout):
+            # return False
+        # linux 系统是ping -c, windows系统是ping -n
+        if platform.system()=='Windows':
+            con = os.system('ping -n 1 www.baidu.com')
+        if platform.system()=='Linux':
+            con = os.system('ping -c 1 www.baidu.com')
+        print(con)
+        if con==0:
+            return True
+        else:
             return False
     
     @retry(retry_on_result=lambda x: x is not True, stop_max_attempt_number=10)
@@ -88,14 +105,25 @@ class Sender(object):
         """
         while True:
             logger.info('Starting dial...')
-            self.run()
-            time.sleep(DIAL_CYCLE)
+            now = datetime.datetime.now()
+            if now.minute%5==0 and now.second==0:
+                logger.info('dial time: %s', now.strftime('%Y-%m-%d %H:%M:%S'))
+            
+            new_ip = self.run()
+            if new_ip != self.ip_pre:
+                
+                self.ip_pre = new_ip
+            else:
+                # IP与上次的相同会自动再次拨号
+                logger.info('IP和上次相同，等待重播......')
+                time.sleep(6)
     
     def run(self):
         """
         拨号主进程
         :return: None
         """
+        #time.sleep(10) #给正在运行的作业留出时间结束
         logger.info('Dial started, remove proxy')
         try:
             self.remove_proxy()
@@ -115,7 +143,7 @@ class Sender(object):
                                                                    ip=ip, port=PROXY_PORT)
             else:
                 proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
-            time.sleep(10)
+            # time.sleep(1)
             if self.test_proxy(proxy):
                 logger.info(f'Valid proxy {proxy}')
                 # 将代理放入数据库
@@ -123,11 +151,14 @@ class Sender(object):
                 time.sleep(DIAL_CYCLE)
             else:
                 logger.error(f'Proxy invalid {proxy}')
+                time.sleep(DIAL_ERROR_CYCLE)
         else:
             # 获取 IP 失败，重新拨号
             logger.error('Get IP failed, re-dialing')
+            ip = ''
+            time.sleep(DIAL_ERROR_CYCLE)
             self.run()
-
+        return ip
 
 def send(loop=True):
     sender = Sender()
