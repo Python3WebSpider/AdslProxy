@@ -3,7 +3,7 @@
 import redis
 import random
 from adslproxy.settings import *
-
+import time
 
 class RedisClient(object):
     def __init__(self, host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, redis_key=REDIS_KEY):
