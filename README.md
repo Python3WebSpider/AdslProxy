@@ -13,14 +13,15 @@ pip3 install -U adslproxy
 ### 设置环境变量
 
 ```
-# Redis 数据库地址和密码
+# Redis 数据库地址、端口和密码
 export REDIS_HOST=
+export REDIS_PORT=
 export REDIS_PASSWORD=
-# 本机配置的代理端口
+# 拨号云主机配置的代理端口
 export PROXY_PORT=
-# 本机配置的代理用户名，无认证则留空
+# 拨号云主机的代理用户名，无认证则留空
 export PROXY_USERNAME=
-# 本机配置的代理密码，无认证则留空
+# 拨号云主机配置的代理密码，无认证则留空
 export PROXY_PASSWORD=
 ```
 
@@ -31,31 +32,6 @@ adslproxy send
 ```
 
 运行结果：
-
-
-```
-pip3 install -U adslproxy
-```
-
-### 设置环境变量
-
-```
-# Redis 数据库地址和密码
-export REDIS_HOST=
-export REDIS_PASSWORD=
-# 本机配置的代理端口
-export PROXY_PORT=
-# 本机配置的代理用户名，无认证则留空
-export PROXY_USERNAME=
-# 本机配置的代理密码，无认证则留空
-export PROXY_PASSWORD=
-```
-
-### 执行
-
-```
-adslproxy send
-```
 
 运行结果：
 
