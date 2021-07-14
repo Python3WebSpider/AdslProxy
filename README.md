@@ -1,3 +1,20 @@
+## 更新和优化(相对于崔大神原脚本)
+1. 增加邮件提醒
+2. 修正拨号间隔错误,原脚本的小bug,拨号间隔会是settings中的两倍
+3. 增加拨号统计:每次拨出的IP放入redis,每拨一次value +1,如果是2会重新拨号,防止重复IP出现.如果需要可以重置下这个频次的值,参考proxy_reset.py.这个考虑到平台对IP的封禁并非长期,通常24小时后能解封
+4. 增加拨号日志可视化监控,在本地运行proxy_stats.py读取远程拨号服务器日志并可视化展示拨号状态,比如这里的adsl1_proxy_quality_monitor.jpg
+![image](https://raw.githubusercontent.com/chenxuzhen/AdslProxy/master/adsl1_proxy_quality_monitor.jpg)
+5. 连续三次拨号无效IP系统会重启,因为这时候服务器已经不能继续拨号了
+6. 从redis删除IP失败系统会重启,这个时候一般都是无法拨号了
+7. 更新proxy检测方式为ping,拨号一次只需要6-7秒(当然和代理商有关系).这个针对单地区adsl vps特别有效,因为单地区拨号服务器带宽都没问题,拨出的IP都很稳定,只要能ping通都是高速可用的.个人建议
+抛弃混拨服务器,带宽低而且拨号慢,不如多个地区的组合.本人测试过三家的拨号服务器,如有需要可提供免费建议.
+8. service.sh放到/etc/init.d目录下, /bin/bash /etc/init.d/service.sh放在/etc/rc.local最后,系统重启后会自动运行拨号脚本.
+9. 增加了拨号服务器一键部署,用squid作代理服务器,中间只需要输入一次密码,参考vpsadsl.sh,用户名默认czhen可以自己修改.另外,如果没有需要,hash掉那段关于修改sshd端口的脚本
+10. 基于以上更新,脚本可以长期运行
+
+Field                                     Value
+czhen:proxy_password@125.121.137.70:3389  1
+
 ## 拨号主机设置
 
 首先配置好代理，如使用 Squid，运行在 3128 端口，并设置好用户名和密码。
