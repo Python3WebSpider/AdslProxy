@@ -9,6 +9,7 @@ import platform
 from loguru import logger
 from retrying import retry, RetryError
 import redis
+from redis.exceptions import ConnectionError
 
 if platform.python_version().startswith('2.'):
     import commands as subprocess
@@ -116,14 +117,17 @@ class Sender(object):
             else:
                 proxy = '{ip}:{port}'.format(ip=ip, port=PROXY_PORT)
             time.sleep(10)
-            if self.test_proxy(proxy):
-                logger.info(f'Valid proxy {proxy}')
-                # 将代理放入数据库
-                self.set_proxy(proxy)
-                time.sleep(DIAL_CYCLE)
-            else:
-                logger.error(f'Proxy invalid {proxy}')
-        else:
+            try:
+                if self.test_proxy(proxy):
+                    logger.info(f'Valid proxy {proxy}')
+                    # 将代理放入数据库
+                    self.set_proxy(proxy)
+                    time.sleep(DIAL_CYCLE)
+                else:
+                    logger.error(f'Proxy invalid {proxy}')
+            except ConnectionError:
+                logger.error('The redis connection is abnormal')
+        else :
             # 获取 IP 失败，重新拨号
             logger.error('Get IP failed, re-dialing')
             self.run()
