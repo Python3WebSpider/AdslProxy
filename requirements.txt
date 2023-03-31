@@ -1,5 +1,5 @@
 requests
-redis==2.10.5
+redis==4.4.4
 tornado
 environs
 loguru
